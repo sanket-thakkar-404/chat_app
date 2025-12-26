@@ -659,6 +659,204 @@ CORS & sameSite notes:
 
 ---
 
+# Messages API - Documentation ✅
+
+This document describes the messaging endpoints implemented in the backend, including required inputs, authentication, expected responses, error examples, and environment variables needed (Cloudinary).
+
+---
+
+## Table of Contents
+- Overview
+- Endpoints
+  - GET `/api/messages/users`
+  - GET `/api/messages/:id`
+  - POST `/api/messages/send/:id`
+- Message schema reference
+- Authentication & Cookies 🔐
+- Status codes
+- Examples (success & error) and cURL
+- Environment variables (Cloudinary)
+
+---
+
+## Overview
+These endpoints power the basic chat functionality:
+- List other users for the chat sidebar
+- Fetch conversation messages between the logged-in user and another user
+- Send a message (text and/or an image)
+
+All message endpoints are protected and require authentication via the HTTP-only `token` cookie set by the auth flow.
+
+---
+
+## Endpoints
+
+### GET /api/messages/users
+- Purpose: Get list of all users (except the logged in user) for the sidebar.
+- Auth: Protected (requires `token` cookie)
+- Returns: Array of user objects (without password)
+
+Success example (200 OK):
+```json
+{
+  "success": true,
+  "message": "Users fetched successfully",
+  "users": [ { "_id": "...", "fullname": {"firstName":"John","lastName":"Doe"}, "email":"john@example.com", "avatar": null }, ... ]
+}
+```
+
+Errors:
+- 401 Unauthorized: Missing or invalid token
+- 500 Internal Server Error
+
+cURL example:
+```bash
+curl -X GET http://localhost:5000/api/messages/users -b cookies.txt
+```
+
+---
+
+### GET /api/messages/:id
+- Purpose: Fetch the conversation messages between the authenticated user and the user with id `:id`.
+- Auth: Protected (requires `token` cookie)
+- Params:
+  - `:id` (string) — user id of the other participant in the conversation
+- Behavior: The server finds messages where (senderId == me & receiverId == id) OR (senderId == id & receiverId == me) and returns them sorted ascending by `createdAt`.
+
+Success example (200 OK):
+```json
+{
+  "success": true,
+  "message": "Messages fetched successfully",
+  "messages": [
+    { "_id":"...", "senderId":"<me>", "receiverId":"<them>", "text":"Hi", "image":null, "status":"sent", "createdAt":"2025-12-26T..." },
+    ...
+  ]
+}
+```
+
+Errors:
+- 400 Bad Request — missing `:id` (or invalid param)
+- 401 Unauthorized — missing/invalid token
+- 500 Internal Server Error
+
+cURL example:
+```bash
+curl -X GET http://localhost:5000/api/messages/<USER_ID> -b cookies.txt
+```
+
+Notes:
+- Consider paginating messages for very long conversations (skip/limit or cursor based).
+- Messages are returned in chronological order (oldest → newest).
+
+---
+
+### POST /api/messages/send/:id
+- Purpose: Send a message to user with id `:id`.
+- Auth: Protected (requires `token` cookie)
+- Params:
+  - `:id` (string) — receiver's user id
+- Request body (JSON):
+  - `text` (string) — optional but at least `text` OR `image` must be provided
+  - `image` (string) — optional base64 data URL or public image URL; if provided, server uploads to Cloudinary and stores the secure URL
+
+Validation rules (enforced by controller):
+- `receiverId` must be present in the path
+- `text` and `image` cannot both be empty
+
+Success (201 Created):
+```json
+{
+  "success": true,
+  "message": "Message sent successfully",
+  "data": {
+    "_id": "...",
+    "senderId": "<me>",
+    "receiverId": "<them>",
+    "text": "Hello",
+    "image": "https://res.cloudinary.com/.../chatty/messages/<file>.jpg",
+    "status": "sent",
+    "createdAt": "2025-12-26T..."
+  }
+}
+```
+
+Errors:
+- 400 Bad Request — missing `receiverId` or both `text` and `image` missing
+```json
+{ "success": false, "message": "Message cannot be empty" }
+```
+- 401 Unauthorized — missing/invalid token
+- 500 Internal Server Error — Cloudinary upload or DB error
+
+cURL example (sending text only):
+```bash
+curl -X POST http://localhost:5000/api/messages/send/<USER_ID> \
+  -H "Content-Type: application/json" \
+  -d '{ "text": "Hello!" }' \
+  -b cookies.txt
+```
+
+cURL example (sending image as base64):
+```bash
+curl -X POST http://localhost:5000/api/messages/send/<USER_ID> \
+  -H "Content-Type: application/json" \
+  -d '{ "image": "data:image/png;base64,<BASE64_DATA>" }' \
+  -b cookies.txt
+```
+
+---
+
+## Message Schema Reference
+Based on `src/Models/message.model.js`:
+- `_id` (ObjectId)
+- `senderId` (ObjectId) — reference to `User` (required)
+- `receiverId` (ObjectId) — reference to `User` (required)
+- `text` (string) — optional
+- `image` (string) — URL to uploaded image
+- `status` (string) — enum: `sent|delivered|seen` (default: `sent`)
+- `seenAt` (Date) — timestamp when recipient saw the message
+- `createdAt`, `updatedAt` (Date) — timestamps
+
+Security notes:
+- Do not include other user's sensitive data (like password) in responses.
+- Validate inputs in middleware or controllers (currently controller checks receiverId and non-empty message).
+
+---
+
+## Authentication & Cookies 🔐
+- These endpoints are protected by `auth.middleware.protectedRoute` which checks `req.cookies.token` and sets `req.user`.
+- Browser clients: use `fetch` with `credentials: 'include'` or Axios with `withCredentials: true`.
+
+---
+
+## Status Codes
+- 201 Created — Message created successfully (POST send)
+- 200 OK — Successful GET requests
+- 400 Bad Request — Validation errors (e.g., missing avatar/text/receiverId)
+- 401 Unauthorized — Missing/invalid token
+- 404 Not Found — Resource not found (e.g., user not found)
+- 500 Internal Server Error — Unexpected server error
+
+---
+
+## Environment variables (Cloudinary)
+- `ClOUDINARY_CLOUD_NAME` — your Cloudinary cloud name
+- `ClOUDINARY_API_KEY` — Cloudinary API key
+- `ClOUDINARY_API_SECRET` — Cloudinary API secret
+
+Notes:
+- The code uses `cloudinary.uploader.upload(...)` to upload message images to `chatty/messages` folder. Ensure Cloudinary env variables are set and correct.
+
+---
+
+## Implementation tips / improvements
+- Add pagination (skip/limit or cursor) to `GET /api/messages/:id` for scalability.
+- Add message delivery and seen acknowledgements (update `status` and `seenAt` when appropriate).
+- Consider sanitizing text to prevent XSS if rendering on the web client.
+
+
+
 
 
 

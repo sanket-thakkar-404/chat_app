@@ -7,6 +7,8 @@ dotenv.config()
 const PORT = process.env.PORT 
 const connectToDB = require('../src/config/db')
 const authRoutes = require('../src/Routes/auth.routes')
+const messageRoutes = require('../src/Routes/message.routes')
+
 connectToDB()
 
 const app = express();
@@ -22,6 +24,7 @@ app.get('/' , (req,res)=>{
 
 
 app.use('/api/auth' , authRoutes)
+app.use('/api/message' , messageRoutes)
 
 app.listen(PORT , ()=>{
   console.log(`server is running in the port : ${PORT}`)
