@@ -433,6 +433,100 @@ Notes:
 
 ---
 
+### PUT /api/auth/update-profile 🔧
+- Purpose: Update the authenticated user's profile avatar.
+- Route: `PUT /api/auth/update-profile` (protected — cookie-based auth)
+- Authentication: Requires HTTP-only cookie `token` set by login/verify/reset (server reads `req.cookies.token`).
+
+Required body (JSON):
+- `avatar` (string) — **required**. Accepts a base64 data URL (e.g., `data:image/png;base64,...`) or a publicly accessible image URL. The server uploads this to Cloudinary and stores the `secure_url` on the user record.
+
+Behavior & notes:
+- If the user has an existing avatar, the server attempts to remove it from Cloudinary before uploading the new image.
+- The controller uses Cloudinary, so Cloudinary env vars must be configured (see the Environment variables section below).
+
+Status codes & examples:
+- **200 OK** — Profile updated successfully
+
+Success example (200 OK):
+```json
+{
+  "success": true,
+  "message": "Profile updated successfully",
+  "user": {
+    "_id": "<id>",
+    "fullname": { "firstName": "John", "lastName": "Doe" },
+    "email": "john@example.com",
+    "avatar": "https://res.cloudinary.com/.../chatty/avatars/<file>.jpg"
+  }
+}
+```
+
+- **400 Bad Request** — Missing `avatar`
+```json
+{ "success": false, "message": "Profile image is required" }
+```
+- **401 Unauthorized** — Missing or invalid auth token
+```json
+{ "success": false, "message": "Unauthorized — user not found in request" }
+```
+- **404 Not Found** — User not found
+```json
+{ "success": false, "message": "User not found" }
+```
+- **500 Internal Server Error** — Cloudinary/upload or server error
+
+Request example (cURL):
+```bash
+curl -X PUT http://localhost:5000/api/auth/update-profile \
+  -H "Content-Type: application/json" \
+  -d '{"avatar":"data:image/png;base64,<BASE64_DATA>"}' \
+  -b cookies.txt
+```
+
+Notes / Tips:
+- For browser clients use `fetch` or `axios` with `credentials: 'include'` / `withCredentials: true` to send cookies automatically.
+- For large images, consider resizing client-side before upload to avoid long upload times and Cloudinary size limits.
+
+---
+
+### GET /api/auth/check-auth ✅
+- Purpose: Verify the auth token and return the currently authenticated user.
+- Route: `GET /api/auth/check-auth` (protected — cookie-based auth)
+- Authentication: Requires HTTP-only cookie `token` set by the server.
+
+Behavior:
+- The middleware verifies the token and attaches the user to `req.user`.
+- If valid, the endpoint responds with the user object (no password returned).
+
+Status codes & examples:
+- **200 OK** — Authorized
+```json
+{
+  "success": true,
+  "message": "User is authorized",
+  "user": {
+    "_id": "<id>",
+    "fullname": { "firstName": "John", "lastName": "Doe" },
+    "email": "john@example.com",
+    "avatar": "https://res.cloudinary.com/.../chatty/avatars/<file>.jpg",
+    "isVerified": true
+  }
+}
+```
+- **401 Unauthorized** — Missing or invalid token
+```json
+{ "success": false, "message": "Unauthorized — token missing or invalid" }
+```
+- **500 Internal Server Error** — Unexpected server error
+
+Request example (cURL):
+```bash
+curl -X GET http://localhost:5000/api/auth/check-auth -b cookies.txt
+```
+
+---
+
 ## Validation & Error Format ⚠️
 - The project uses `express-validator` and the `auth.validate` middleware.
 - Validation failures return **400** and payload like:
@@ -471,6 +565,14 @@ Set these in your `.env` file (or in your hosting environment). Example values a
 - `SMTP_PORT` (number) — SMTP port (e.g., `587`)
 - `SMTP_USER` (string) — SMTP username
 - `SMTP_PASS` (string) — SMTP password
+
+Cloudinary (required for `update-profile`):
+- `ClOUDINARY_CLOUD_NAME` (string) — your Cloudinary cloud name (example: `your-cloud-name`)
+- `ClOUDINARY_API_KEY` (string) — Cloudinary API key
+- `ClOUDINARY_API_SECRET` (string) — Cloudinary API secret
+
+Notes:
+- Ensure `NODE_ENV` is set to `development` when testing locally so cookies are set with `secure:false`. In production, `secure:true` is enforced for cookies.
 
 Optional / recommended:
 - `FRONTEND_URL` (string) — for CORS and email links

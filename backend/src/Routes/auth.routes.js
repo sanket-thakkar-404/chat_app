@@ -67,4 +67,9 @@ router.get('/check-auth',
   authMiddleware.protectedRoute,
   authController.checkAuthStatus
 )
+
+
+
+
+
 module.exports = router;
