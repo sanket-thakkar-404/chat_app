@@ -63,5 +63,8 @@ router.put('/update-profile',
   authMiddleware.protectedRoute,
   authController.updateUserProfile)
 
-
+router.get('/check-auth',
+  authMiddleware.protectedRoute,
+  authController.checkAuthStatus
+)
 module.exports = router;

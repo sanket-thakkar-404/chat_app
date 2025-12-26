@@ -1,9 +1,9 @@
-const { use } = require('../config/email.config');
 const generateToken = require('../lib/utils');
 const sendVerificationEmail = require('../Middleware/SendEmail');
 const userModel = require('../Models/user.model');
 const User = require('../Models/user.model')
 const bcrypt = require('bcrypt')
+const cloudinary = require('../config/cloudinary.config')
 
 // step 1 : signup by user and get user data
 module.exports.signupUser = async (req, res) => {
@@ -175,7 +175,7 @@ module.exports.loginUser = async (req, res) => {
       });
     }
 
-    generateToken(user._id, res);
+    const token = generateToken(user._id, user.email, res);
 
     return res.status(200).json({
       success: true,
@@ -183,9 +183,10 @@ module.exports.loginUser = async (req, res) => {
       fullname: user.fullname,
       email: user.email,
       avatar: user.avatar,
+      token,
     });
   } catch (err) {
-    console.error('Login error:', err.message);
+    console.error('Login error:', err);
     return res.status(500).json({
       success: false,
       message: 'Internal Server error',
@@ -329,9 +330,71 @@ module.exports.getUserProfile = async (req, res) => {
 
 }
 // update user profile Photo
-module.exports.updateUserProfile = (req, res) => {
+module.exports.updateUserProfile = async (req, res) => {
+  try {
+    const { avatar } = req.body;
 
-}
+    if (!avatar) {
+      return res.status(400).json({
+        success: false,
+        message: "Profile image is required"
+      });
+    }
+
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized — user not found in request"
+      });
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Delete old avatar if exists
+    if (user.avatar) {
+      try {
+        const publicId = user.avatar.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(`chatty/avatars/${publicId}`);
+      } catch { }
+    }
+
+    // Upload new avatar
+    const uploadRes = await cloudinary.uploader.upload(avatar, {
+      folder: "chatty/avatars",
+      resource_type: "image",
+      transformation: [{ width: 400, height: 400, crop: "fill" }]
+    });
+    // console.log("Cloudinary Upload Response:", uploadRes);
+    user.avatar = uploadRes.secure_url;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        _id: user._id,
+        fullname: user.fullname,
+        email: user.email,
+        avatar: user.avatar
+      }
+    });
+
+  } catch (err) {
+    console.error("Profile Update Error:", err.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+};
 // user logout 
 module.exports.logoutUser = (req, res) => {
   try {
@@ -342,5 +405,30 @@ module.exports.logoutUser = (req, res) => {
     res.status(500).json({ message: 'Internal Server error' })
   }
 }
+// check auth status
+module.exports.checkAuthStatus = (req, res) => {
+  try {
+
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized — token missing or invalid"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User is authorized",
+      user: req.user
+    });
+
+  } catch (err) {
+    console.error("Check Auth Status Error:", err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
 
 
