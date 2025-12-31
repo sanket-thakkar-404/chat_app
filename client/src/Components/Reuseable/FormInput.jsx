@@ -6,6 +6,7 @@ export default function FormInput({
   value,
   onChange,
   className = "",
+  disabled,
 }) {
   return (
     <div className="form-control">
@@ -17,6 +18,7 @@ export default function FormInput({
         <input
           type={type}
           value={value}
+          disabled={disabled}
           onChange={onChange}
           placeholder={placeholder}
           className={`w-full px-10 py-3 border border-base-content/20 outline-none rounded-lg ${className}`}

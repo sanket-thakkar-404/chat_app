@@ -1,11 +1,10 @@
-module.exports = {
-  Verification_Email_Template: (name, verificationCode) => `
+module.exports.Verification_Email_Template = (name, verificationCode) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Verify Your Chatty Account</title>
+  <title>Verify Your TalkS Account</title>
 
   <style>
     body {
@@ -32,8 +31,8 @@ module.exports = {
     }
 
     .logo-icon {
-      width: 42px;
-      height: 42px;
+      padding : 42px;
+      text-align: center;
       border-radius: 8px;
       background: #5d5fef;
       display: inline-flex;
@@ -93,15 +92,15 @@ module.exports = {
 <div class="container">
 
   <div class="logo">
-    <div class="logo-icon">C</div>
+    <div class="logo-icon">T</div>
   </div>
 
-  <div class="title">Verify Your Chatty Account</div>
+  <div class="title">Verify Your TALKS Account</div>
 
   <p class="text-block">Hey ${name},</p>
 
   <p class="text-block">
-    Thanks for signing up! To finish creating your Chatty account,
+    Thanks for signing up! To finish creating your <b>TALKS</b> account,
     please verify your email using the code below:
   </p>
 
@@ -110,7 +109,7 @@ module.exports = {
   </div>
 
   <p class="text-block">
-    Enter this verification code inside the Chatty app to continue.
+    Enter this verification code inside the TALKS app to continue.
   </p>
 
   <p class="section-title">A few things to keep in mind:</p>
@@ -126,27 +125,30 @@ module.exports = {
   </p>
 
   <p class="text-block">
-    — The Chatty Team
+    — The TALKS Team
   </p>
 
   <div class="footer">
-    &copy; ${new Date().getFullYear()} Chatty • Secure Messaging Platform
+    &copy; ${new Date().getFullYear()} TALKS • Secure Messaging Platform
   </div>
 
 </div>
 
 </body>
-</html>`
-}
+</html>`,
 
 
-module.exports.Welcome_Email_Template = (name) => {
-  `<!DOCTYPE html>
+
+
+
+
+  module.exports.Welcome_Email_Template = (name) =>
+    `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Chatty</title>
+  <title>Welcome to TALKS</title>
 
   <style>
     body {
@@ -230,7 +232,7 @@ module.exports.Welcome_Email_Template = (name) => {
   <div class="container">
 
     <div class="header">
-      Welcome to Chatty 🎉
+      Welcome to TALKS 🎉
     </div>
 
     <div class="content">
@@ -238,11 +240,11 @@ module.exports.Welcome_Email_Template = (name) => {
       <p class="welcome">Hi ${name},</p>
 
       <p>
-        We're excited to have you on board — your Chatty account is now active.
+        We're excited to have you on board — your TALKS account is now active.
       </p>
 
       <p>
-        Chatty helps you connect faster, chat smarter, and stay in sync across all your devices.
+        TALKS helps you connect faster, chat smarter, and stay in sync across all your devices.
         Here’s what you can start doing right away:
       </p>
 
@@ -253,7 +255,7 @@ module.exports.Welcome_Email_Template = (name) => {
         <li>Access your chats seamlessly across devices</li>
       </ul>
 
-      <a href="#" class="cta-btn">Open Chatty App</a>
+      <a href="#" class="cta-btn">Open TALKS App</a>
 
       <p class="info-note">
         If you didn’t create this account, please contact our support team immediately.
@@ -262,11 +264,11 @@ module.exports.Welcome_Email_Template = (name) => {
     </div>
 
     <div class="footer">
-      &copy; ${new Date().getFullYear()} Chatty — Secure Messaging Platform
+      &copy; ${new Date().getFullYear()} TALKS — Secure Messaging Platform
     </div>
 
   </div>
 
 </body>
 </html>
-`}
+`

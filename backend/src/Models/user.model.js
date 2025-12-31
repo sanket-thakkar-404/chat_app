@@ -60,10 +60,6 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
     // for password reset
-    resetCode: {
-      type: String
-    },
-
     resetCodeExpires: {
       type: Date
     },

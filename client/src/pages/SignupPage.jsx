@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/UseAuthStore";
-import { Eye, EyeOff, Lock, Mail, MessageSquare, User } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import FormInput from "../Components/Reuseable/FormInput";
 import AuthImagePattern from "../Components/Reuseable/AuthImagePattern";
 import toast from "react-hot-toast";
 import Logo from "../Components/Reuseable/Logo";
+import LoadingButton from "../Components/Reuseable/LoadingButton";
+import AuthSwitchLink from "../Components/Reuseable/AuthSwitchLink";
+import AuthHeader from "../Components/Reuseable/AuthHeader";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +24,8 @@ const SignUpPage = () => {
     password: "",
     confirmPassword: "",
   });
+
+  console.log(formData.password.length)
 
   const validateForm = () => {
     const { fullname, email, password, confirmPassword } = formData;
@@ -71,6 +76,7 @@ const SignUpPage = () => {
 
     if (!res?.success) return; // ⛔ stop if signup failed
     // console.log(res.data.email);
+    sessionStorage.setItem("otp_mode", "signup");
     sessionStorage.setItem("pendingEmail", res.data.email);
 
     navigate("/verify-email");
@@ -83,20 +89,10 @@ const SignUpPage = () => {
         <div className="w-full max-w-2xl space-y-2">
           {/* LOGO */}
           <Logo />
-          <div className="text-center mb-8">
-            <div className="flex flex-col items-center gap-2 group">
-              <div
-                className="size-13 rounded-xl bg-primary/10 flex items-center justify-center 
-              group-hover:bg-primary/20 transition-colors"
-              >
-                <MessageSquare className="size-7 text-primary" />
-              </div>
-              <h1 className="text-2xl font-bold mt-2">Create Account</h1>
-              <p className="text-base-content/60">
-                Get started with your free account
-              </p>
-            </div>
-          </div>
+          <AuthHeader
+            title="Create Account"
+            subtitle="Get started with your free account"
+          />
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
@@ -200,30 +196,18 @@ const SignUpPage = () => {
                 <p className="text-red-500 text-sm mt-1">{passwordError}</p>
               )}
             </div>
-            <button
-              type="submit"
-              disabled={isSigningUp}
-              className="btn btn-lg  btn-primary w-full px-5 py-3 rounded-xl mt-2"
-            >
-              {isSigningUp ? (
-                <h3>
-                  Loading
-                  <span className="loading loading-dots loading-xl"></span>
-                </h3>
-              ) : (
-                "Create Account"
-              )}
-            </button>
+            <LoadingButton
+              isLoading={isSigningUp}
+              loadingText="Loading"
+              children="Create Account"
+            />
           </form>
 
-          <div className="text-center mt-9">
-            <p className="text-base-content/60">
-              Already have an account?{" "}
-              <Link to="/login" className="link link-primary">
-                Sign in
-              </Link>
-            </p>
-          </div>
+          <AuthSwitchLink
+            message="Already have an account?"
+            to="/login"
+            linkText="  Sign in"
+          />
         </div>
       </div>
 

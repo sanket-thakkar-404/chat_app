@@ -3,7 +3,8 @@ const sendVerificationEmail = require('../Middleware/SendEmail');
 const userModel = require('../Models/user.model');
 const User = require('../Models/user.model')
 const bcrypt = require('bcrypt')
-const cloudinary = require('../config/cloudinary.config')
+const cloudinary = require('../config/cloudinary.config');
+const WelcomeEmail = require('../Middleware/WelcomeEmail');
 
 // step 1 : signup by user and get user data
 module.exports.signupUser = async (req, res) => {
@@ -40,7 +41,11 @@ module.exports.signupUser = async (req, res) => {
     const name = `${newUser.fullname.firstName} ${newUser.fullname.lastName}`;
     sendVerificationEmail(newUser.email, name, verificationCode)
 
-    return res.status(201).json({ success: true, message: 'Account created. Please verify your email to continue', newUser })
+    return res.status(201).json({
+      success: true, message: 'Account created. Please verify your email to continue', user: {
+        email: newUser.email,
+      }
+    })
 
   } catch (err) {
     console.error('Signup error:', err.message);
@@ -81,13 +86,14 @@ module.exports.verifyEmail = async (req, res) => {
     user.isVerified = true;
     user.verificationCode = undefined;
     user.verificationCodeExpires = undefined;
+    user.status = 'online'
 
     await user.save();
 
 
     // issue auth token AFTER successful verification
-    const token = generateToken(user._id, user.email, res)
-
+    generateToken(user._id, user.email, res)
+    await WelcomeEmail(user.email, user.fullname.firstName)
     return res.status(200).json({
       success: true,
       message: "Email verified successfully",
@@ -97,7 +103,6 @@ module.exports.verifyEmail = async (req, res) => {
         email: user.email,
         avatar: user.avatar
       },
-      token,
     });
 
   } catch (err) {
@@ -174,7 +179,8 @@ module.exports.loginUser = async (req, res) => {
         message: 'Invalid credentials',
       });
     }
-
+    user.status = 'online'
+    await user.save()
     const token = generateToken(user._id, user.email, res);
 
     return res.status(200).json({
@@ -183,6 +189,7 @@ module.exports.loginUser = async (req, res) => {
       fullname: user.fullname,
       email: user.email,
       avatar: user.avatar,
+      status: user.status,
       token,
     });
   } catch (err) {
@@ -208,7 +215,7 @@ module.exports.requestPasswordReset = async (req, res) => {
     }
     const name = `${user.fullname.firstName} ${user.fullname.lastName}`;
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.resetCode = otp;
+    user.verificationCode = otp;
     user.resetCodeExpires = Date.now() + 10 * 60 * 1000; // 10 min
     user.lastPasswordResetRequestAt = Date.now();
     user.canResetPassword = false;
@@ -216,11 +223,14 @@ module.exports.requestPasswordReset = async (req, res) => {
     await user.save();
 
     // send email 
-    sendVerificationEmail(user.email, name, user.resetCode);
+    sendVerificationEmail(user.email, name, user.verificationCode);
 
     return res.status(200).json({
       success: true,
-      message: "Password reset code sent to email"
+      message: "Password reset code sent to email",
+      user: {
+        email: user.email
+      }
     });
 
   } catch (err) {
@@ -257,7 +267,7 @@ module.exports.verifyResetCode = async (req, res) => {
 
     user.canResetPassword = true;
     // invalidate OTP (no replay)
-    user.resetCode = undefined;
+    user.verificationCode = undefined;
     user.resetCodeExpires = undefined;
     await user.save();
 
@@ -301,19 +311,13 @@ module.exports.resetPassword = async (req, res) => {
     user.canResetPassword = false; // reset the flag
 
     // cleanup reset fields
-    user.resetCode = undefined;
+    user.verificationCode = undefined;
     user.resetCodeExpires = undefined;
 
     await user.save();
 
-    generateToken(user._id, res);
-
     return res.status(200).json({
       success: true,
-      _id: user._id,
-      fullname: user.fullname,
-      email: user.email,
-      avatar: user.avatar,
       message: "Password reset successfully"
     });
 

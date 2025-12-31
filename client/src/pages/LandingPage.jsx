@@ -20,9 +20,10 @@ export default function LandingPage() {
         <div
           className="
           absolute bottom-0 left-0 right-0
-          bg-white
           rounded-t-3xl
           px-8 py-8
+          bg-[#1d232a]
+          text-white
           shadow-lg
           md:hidden
         "
@@ -31,7 +32,7 @@ export default function LandingPage() {
 
           <button
             onClick={() => navigate("/home")}
-            className="w-full bg-black text-white py-3 rounded-xl flex justify-center text-lg"
+            className="w-full bg-black text-white py-3 rounded-xl flex justify-center text-lg hover:text-black hover:bg-white active:scale-95"
           >
             Say Hey!
           </button>
@@ -39,7 +40,7 @@ export default function LandingPage() {
       </div>
 
       {/* Right Panel — only for desktop */}
-      <div className="hidden md:flex flex-col justify-center px-24 gap-15 bg-white">
+      <div className="hidden md:flex flex-col justify-center px-24 gap-15 text-white">
         {/* Big Bold Heading */}
         <h1 className="text-8xl font-extrabold tracking-tight">Say hello!</h1>
 
@@ -52,7 +53,7 @@ export default function LandingPage() {
         {/* Minimal Outlined Button */}
         <button
           onClick={() => navigate("/home")}
-          className="inline-flex items-center justify-center px-8 py-3 border border-black rounded-full text-xl font-medium hover:bg-black hover:text-white transition "
+          className="inline-flex items-center justify-center px-8 py-3 border border-black rounded-full text-xl font-medium hover:text-black hover:bg-white transition "
         >
           Say hey!
         </button>

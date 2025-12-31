@@ -9,11 +9,13 @@ export const useAuthStore = create((set) => ({
   isLoggingOut: false,
   isResendOTP: false,
   isVerifyingOTP: false,
+  isSetNewPassword: false,
+  isResendingCode: false,
+  isResettingPassword: false,
   isUpdatingProfile: false,
-
   isCheckingAuth: true,
+
   checkAuth: async () => {
-    set({ isCheckingAuth: true });
     try {
       const res = await axiosInstance.get("/auth/check-auth");
       set({ authUser: res.data });
@@ -24,6 +26,7 @@ export const useAuthStore = create((set) => ({
       set({ isCheckingAuth: false });
     }
   },
+
   signup: async (formData) => {
     set({ isSigningUp: true });
     try {
@@ -41,6 +44,7 @@ export const useAuthStore = create((set) => ({
       }, 1000);
     }
   },
+
   verifyOTP: async (email, code) => {
     set({ isVerifyingOtp: true });
     try {
@@ -49,7 +53,7 @@ export const useAuthStore = create((set) => ({
         code,
       });
       set({ authUser: res.data });
-      console.log(res);
+      // console.log(res);
       toast.success(res.data.message || "OTP verified successfully");
       return { success: true, data: res.data };
     } catch (err) {
@@ -59,6 +63,7 @@ export const useAuthStore = create((set) => ({
       set({ isVerifyingOtp: false });
     }
   },
+
   resendOTP: async (email) => {
     set({ isResendOTP: true });
 
@@ -89,7 +94,8 @@ export const useAuthStore = create((set) => ({
       set({ isResendOTP: false });
     }
   },
-  Logout: async () => {
+
+  logout: async () => {
     set({ isLoggingOut: true });
     try {
       await axiosInstance.post("/auth/logout");
@@ -98,6 +104,94 @@ export const useAuthStore = create((set) => ({
     } catch (err) {
       console.error("Error in Logging out ", err);
       toast.error("Error in Logging Out");
+    }
+  },
+
+  login: async (formData) => {
+    set({ isLoggingIn: true });
+    try {
+      const res = await axiosInstance.post("/auth/login", formData);
+      set({ authUser: res.data });
+      toast.success(res.data.message || "Login Account Successfully");
+      return { success: true, data: res.data };
+    } catch (err) {
+      console.error("Error in Login Page :", err.message);
+      toast.error(err.response.data.message);
+    } finally {
+      set({ isLoggingIn: false });
+    }
+  },
+
+  resetPassword: async (email) => {
+    set({ isResettingPassword: true });
+    try {
+      const res = await axiosInstance.post("/auth/request-password-reset", {
+        email,
+      });
+      // console.log(res)
+      toast.success(res.data.message || "Resend Code Sent Successfully");
+      return { success: true, data: res.data };
+    } catch (err) {
+      console.error("Error in resetting Password :", err);
+
+      const msg = err.response?.data?.message || "";
+      if (msg.toLowerCase().includes("user not found")) {
+        return { success: false, reason: undefined };
+      }
+      toast.error(err.response?.data?.message || "Reset Code failed");
+    } finally {
+      set({ isResettingPassword: false });
+    }
+  },
+
+  resetCode: async (email, code) => {
+    set({ isResendingCode: true });
+    try {
+      const res = await axiosInstance.post("/auth/verify-reset-code", {
+        email,
+        code,
+      });
+      // console.log(res);
+      toast.success(res.data.message || "OTP verified successfully");
+      return { success: true, data: res.data };
+    } catch (err) {
+      console.error("OTP verify failed:", err);
+      toast.error(err.response?.data?.message || "Invalid or expired OTP");
+    } finally {
+      set({ isResendingCode: false });
+    }
+  },
+
+  setNewPassword: async (formData) => {
+    set({ isSetNewPassword: true });
+    try {
+      const res = await axiosInstance.post("/auth/reset-password", formData);
+      toast.success(res.data.message || "Password reset successfully");
+      return { success: true, data: res.data };
+    } catch (err) {
+      console.error("Error Resetting Password ", err);
+      toast.error(err.response?.data?.message || "Invalid Reset Password");
+    } finally {
+      set({ isSetNewPassword: false });
+    }
+  },
+
+  updateProfile: async (data) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const res = await axiosInstance.put("/auth/update-profile", data );
+      set({ authUser: res.data });
+      toast.success(res.data.message || "Profile pic updated successfully");
+    } catch (err) {
+      console.error("Error in Updating Profile", err);
+     const message =
+    err?.response?.data?.message ||
+    err?.message ||
+    "Failed to update profile";
+
+  toast.error(message);
+    } finally {
+      set({ isUpdatingProfile: false });
     }
   },
 }));

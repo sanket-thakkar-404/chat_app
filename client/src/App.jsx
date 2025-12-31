@@ -10,6 +10,8 @@ import { useEffect } from "react";
 import HomePage from "./pages/HomePage";
 import { Toaster } from 'react-hot-toast';
 import VerifyOtp from "./pages/VerifyOtp";
+import ForgetPassword from "./pages/ForgetPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 
 
@@ -33,7 +35,7 @@ const App = () => {
   }
 
   return (
-    <div className="">
+    <div data-theme="dark">
       {!hideNavbar && <Navbar />}
 
       <Routes>
@@ -50,6 +52,15 @@ const App = () => {
         <Route
           path="/verify-email"
           element={!authUser ? <VerifyOtp /> : <Navigate to="/home" />}
+        />
+       
+        <Route
+          path="/forget-password"
+          element={!authUser ? <ForgetPassword /> : <Navigate to="/home" />}
+        />
+        <Route
+          path="/reset-password"
+          element={!authUser ? <ResetPassword /> : <Navigate to="/home" />}
         />
         <Route
           path="/signup"
