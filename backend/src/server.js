@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const cors = require('cors')
 const path = require('path')
+const fs = require('fs')
 dotenv.config()
 // const server = require('./')
 
@@ -34,10 +35,24 @@ app.use('/api/users', userRoutes)
 app.use('/api/messages', messageRoutes)
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
+  const staticPath = path.join(__dirname, "../client/dist");
+  app.use(express.static(staticPath));
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, "../client", "dist", "index.html"));
+  // Catch-all handler: serve index.html for any non-API routes
+  app.use((req, res, next) => {
+    // Skip if it's an API route
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
+
+    // Try to serve the file if it exists, otherwise serve index.html
+    const filePath = path.join(staticPath, req.path);
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      return res.sendFile(filePath);
+    }
+
+    // Serve index.html for SPA routing
+    res.sendFile(path.join(staticPath, "index.html"));
   });
 }
 
