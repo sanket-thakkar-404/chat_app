@@ -8,11 +8,11 @@ dotenv.config()
 const PORT = process.env.PORT
 const connectToDB = require('../src/config/db')
 const authRoutes = require('../src/Routes/auth.routes')
-const messageRoutes = require('../src/Routes/message.routes')
+const userRoutes = require('../src/Routes/user.routes')
+const messageRoutes = require('../src/Routes/message.routes');
+const { app, server } = require('./lib/Socket');
 
 connectToDB()
-
-const app = express();
 
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
@@ -29,8 +29,9 @@ app.get('/', (req, res) => {
 
 
 app.use('/api/auth', authRoutes)
-app.use('/api/message', messageRoutes)
+app.use('/api/users', userRoutes)
+app.use('/api/messages', messageRoutes)
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`server is running in the port : ${PORT}`)
 })

@@ -12,15 +12,19 @@ module.exports.protectedRoute = async (req, res, next) => {
 
     if (!decoded) return res.status(401).json({ message: 'Unauthorized - Invalid token' })
 
-    const user = await User.findById(decoded.userId)
+    const user = await User.findById(decoded.userId).select('-password')
 
     if (!user) return res.status(404).json({ message: 'user not found' })
 
+    // 🔴 BLOCK unverified users here
+    if (!user.isVerified) {
+      return res.status(403).json({ message: 'Account not verified' });
+    }
     req.user = user;
 
     next()
   } catch (err) {
-    console.error('Error in Protect Routes Middleware : ' , err.message)
-    res.status(500).json({message : 'Internal server Error'})
+    console.error('Error in Protect Routes Middleware : ', err.message)
+    res.status(500).json({ message: 'Internal server Error' })
   }
 }

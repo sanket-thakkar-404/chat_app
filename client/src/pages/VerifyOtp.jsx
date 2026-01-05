@@ -30,8 +30,9 @@ const VerifyOtp = () => {
     isResendOTP,
     resetCode,
     isResendingCode,
+    authUser,
   } = useAuthStore();
-
+console.log(authUser)
   const [status, setStatus] = useState("idle");
   const [userOTP, setUserOTP] = useState("");
   const [coolDown, setCoolDown] = useState(0);

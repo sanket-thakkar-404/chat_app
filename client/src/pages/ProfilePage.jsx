@@ -1,12 +1,27 @@
 import { useAuthStore } from "../Store/UseAuthStore";
-import { Camera, Mail, User } from "lucide-react";
+import { Camera, Mail, Shuffle, User } from "lucide-react";
 import FormInput from "../Components/Reuseable/FormInput";
 import { useState } from "react";
 
 const ProfilePage = () => {
-  const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
+  const {
+    authUser,
+    isUpdatingProfile,
+    updateProfile,
+    randomProfile,
+    isRandomProfile,
+  } = useAuthStore();
   const [selectedImg, setSelectedImg] = useState(null);
-  const fullname = `${authUser.user.fullname.firstName} ${authUser.user.fullname.lastName}`;
+  console.log("authUser:", authUser);
+  const fullname = `${authUser.fullname.firstName} ${authUser.fullname.lastName}`;
+
+  const randomAvatar = async () => {
+    const idx = Math.floor(Math.random() * 100) + 1;
+    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
+
+    await randomProfile({ avatar: randomAvatar });
+    setSelectedImg(randomAvatar);
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -36,7 +51,7 @@ const ProfilePage = () => {
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <img
-                src={selectedImg || authUser.user.avatar || "avatar.jpg"}
+                src={selectedImg || authUser.avatar || "avatar.jpg"}
                 alt="Profile"
                 className="size-42 rounded-full object-top object-cover border-4 "
               />
@@ -66,8 +81,25 @@ const ProfilePage = () => {
             <p className="text-sm text-zinc-400">
               {isUpdatingProfile
                 ? "Uploading..."
-                : "Click the camera icon to update your photo"}
+                : "Click the camera Customize photo update your photo"}
             </p>
+            <button
+              type="button"
+              className="flex gap-3 bg-primary px-6 py-3 rounded-xl"
+              onClick={randomAvatar}
+              disabled={isRandomProfile}
+            >
+              {isRandomProfile ? (
+                <h3>
+                  'uploading'
+                  <span className="loading loading-dots loading-xl"></span>
+                </h3>
+              ) : (
+                <h5 className="flex gap-3">
+                  <Shuffle /> Generate Random Avatar'
+                </h5>
+              )}
+            </button>
           </div>
 
           <div className="max-w-2xl mx-auto">
@@ -95,7 +127,7 @@ const ProfilePage = () => {
                   type="text"
                   label="Email Address"
                   icon={<Mail />}
-                  value={authUser?.user?.email}
+                  value={authUser?.email}
                   disabled
                   className="bg-zinc-900 text-zinc-400 border-zinc-700 cursor-not-allowed"
                 />
@@ -108,7 +140,7 @@ const ProfilePage = () => {
                   <div className="flex items-center justify-between py-3 mt-8">
                     <span className="text-md text-zinc-400">Member Since</span>
                     <span className={`text-sm font-medium `}>
-                      {authUser.user.createdAt?.split("T")[0]}
+                      {authUser.createdAt?.split("T")[0]}
                     </span>
                   </div>
                   <hr className="text-zinc-600" />
@@ -117,7 +149,7 @@ const ProfilePage = () => {
                       Account Status
                     </span>
 
-                    {authUser?.user?.status === "online" ? (
+                    {authUser?.status === "online" ? (
                       <span className="flex items-center gap-2 text-sm font-medium text-emerald-400">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
                         Online

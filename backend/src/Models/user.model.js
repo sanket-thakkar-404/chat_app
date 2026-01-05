@@ -69,6 +69,13 @@ const userSchema = new mongoose.Schema(
       default: false
     },
 
+    friends: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
     lastPasswordResetRequestAt: {
       type: Date
     }

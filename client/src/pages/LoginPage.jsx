@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../store/UseAuthStore";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import AuthImagePattern from "../Components/Reuseable/AuthImagePattern";
@@ -103,7 +103,10 @@ const LoginPage = () => {
               />
             </div>
 
-            <Link to='/forget-password' className="flex justify-end w-full link link-primary">
+            <Link
+              to="/forget-password"
+              className="flex justify-end w-full link link-primary"
+            >
               ForgetPassword ?
             </Link>
             <LoadingButton

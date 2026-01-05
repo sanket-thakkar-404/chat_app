@@ -1,9 +1,13 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
+import { io } from "socket.io-client";
 
-export const useAuthStore = create((set) => ({
+const BASE_URl = import.meta.env.VITE_BACKEND_URL;
+
+export const useAuthStore = create((set, get) => ({
   authUser: null,
+  onlineUsers: [],
   isSigningUp: false,
   isLoggingIn: false,
   isLoggingOut: false,
@@ -13,12 +17,15 @@ export const useAuthStore = create((set) => ({
   isResendingCode: false,
   isResettingPassword: false,
   isUpdatingProfile: false,
+  isRandomProfile: false,
   isCheckingAuth: true,
+  socket: null,
 
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check-auth");
-      set({ authUser: res.data });
+      set({ authUser: res.data.user });
+      get().connectSocket();
     } catch (err) {
       console.error("Error in checkAuth  : ", err);
       set({ authUser: null });
@@ -45,6 +52,8 @@ export const useAuthStore = create((set) => ({
     }
   },
 
+  // ya signup ja liya ha
+  // socket yahe connect hu ha
   verifyOTP: async (email, code) => {
     set({ isVerifyingOtp: true });
     try {
@@ -55,6 +64,8 @@ export const useAuthStore = create((set) => ({
       set({ authUser: res.data });
       // console.log(res);
       toast.success(res.data.message || "OTP verified successfully");
+      toast.success("Account Create successfully");
+      get().connectSocket();
       return { success: true, data: res.data };
     } catch (err) {
       console.error("OTP verify failed:", err);
@@ -100,6 +111,7 @@ export const useAuthStore = create((set) => ({
     try {
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
+      get().disconnectSocket();
       toast.success("Logged out SuccessFully");
     } catch (err) {
       console.error("Error in Logging out ", err);
@@ -107,16 +119,19 @@ export const useAuthStore = create((set) => ({
     }
   },
 
+  // yahe par login ho ga
+  // ya par socket connect bhi hoga
   login: async (formData) => {
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", formData);
       set({ authUser: res.data });
       toast.success(res.data.message || "Login Account Successfully");
+      get().connectSocket();
       return { success: true, data: res.data };
     } catch (err) {
-      console.error("Error in Login Page :", err.message);
-      toast.error(err.response.data.message);
+      console.error("Error in Login Page :", err);
+      toast.error(err.response.data.message || 'fail to login');
     } finally {
       set({ isLoggingIn: false });
     }
@@ -124,6 +139,7 @@ export const useAuthStore = create((set) => ({
 
   resetPassword: async (email) => {
     set({ isResettingPassword: true });
+    set({ authUser: null });
     try {
       const res = await axiosInstance.post("/auth/request-password-reset", {
         email,
@@ -179,19 +195,67 @@ export const useAuthStore = create((set) => ({
   updateProfile: async (data) => {
     set({ isUpdatingProfile: true });
     try {
-      const res = await axiosInstance.put("/auth/update-profile", data );
-      set({ authUser: res.data });
+      const res = await axiosInstance.put("/auth/update-profile", data);
+      set({ authUser: res.data.user });
       toast.success(res.data.message || "Profile pic updated successfully");
     } catch (err) {
       console.error("Error in Updating Profile", err);
-     const message =
-    err?.response?.data?.message ||
-    err?.message ||
-    "Failed to update profile";
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to update profile";
 
-  toast.error(message);
+      toast.error(message);
     } finally {
       set({ isUpdatingProfile: false });
+    }
+  },
+  // this is for random random
+  randomProfile: async (data) => {
+    set({ isRandomProfile: true });
+    try {
+      const res = await axiosInstance.put("/auth/update-random-profile", data);
+      toast.success(
+        res.data.message || "Random Profile pic updated successfully"
+      );
+    } catch (err) {
+      console.error("Error in Random Updating Profile", err);
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to update profile";
+
+      toast.error(message);
+    } finally {
+      set({ isRandomProfile: false });
+    }
+  },
+
+  // this area is for socket connection
+  connectSocket: () => {
+    const { authUser } = get();
+    if (!authUser || get().socket?.connected) return;
+
+    const socket = io(BASE_URl, {
+      query: {
+        userId: authUser._id,
+      },
+    });
+    socket.on("getOnlineUsers", (userIds) => {
+      set({ onlineUsers: userIds });
+    });
+    socket.connect;
+
+    set({ socket: socket });
+  },
+
+  disconnectSocket: () => {
+    const socket = get().socket;
+
+    if (!socket) return;
+
+    if (socket.connected) {
+      socket.disconnect();
     }
   },
 }));

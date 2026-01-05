@@ -63,6 +63,13 @@ router.put('/update-profile',
   authMiddleware.protectedRoute,
   authController.updateUserProfile)
 
+
+router.put('/update-random-profile',
+  authMiddleware.protectedRoute,
+  authController.updateRandomAvatar)
+
+
+
 router.get('/check-auth',
   authMiddleware.protectedRoute,
   authController.checkAuthStatus

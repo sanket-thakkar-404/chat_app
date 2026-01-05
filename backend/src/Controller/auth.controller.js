@@ -82,7 +82,11 @@ module.exports.verifyEmail = async (req, res) => {
     if (code !== user.verificationCode) return res.status(400).json({ success: false, message: 'Invalid verification code' })
 
 
+    const idx = Math.floor(Math.random() * 100) + 1
+    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`
+
     // mark verified
+    user.avatar = randomAvatar;
     user.isVerified = true;
     user.verificationCode = undefined;
     user.verificationCodeExpires = undefined;
@@ -261,7 +265,7 @@ module.exports.verifyResetCode = async (req, res) => {
     if (!user.resetCodeExpires || Date.now() > user.resetCodeExpires) return res.status(400).json({ success: false, message: 'Reset code expired' })
 
     // compare reset code
-    if (user.resetCode !== code) return res.status(400).json({ success: false, message: 'Invalid reset code' })
+    if (user.verificationCode !== code) return res.status(400).json({ success: false, message: 'Invalid reset code' })
 
     // allow user to reset password
 
@@ -399,6 +403,51 @@ module.exports.updateUserProfile = async (req, res) => {
     });
   }
 };
+
+
+module.exports.updateRandomAvatar = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    if (!avatar) {
+      return res.status(400).json({
+        success: false,
+        message: "Profile image is required"
+      });
+    }
+
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized — user not found in request"
+      });
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    user.avatar = avatar
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+    });
+
+  } catch (err) {
+    console.log('Error In Random avatar generator' , err)
+     return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+
+}
 // user logout 
 module.exports.logoutUser = (req, res) => {
   try {

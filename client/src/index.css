@@ -11,3 +11,19 @@
 body {
   overflow: hidden;
 }
+.theme {
+  overflow-y: auto; /* scroll enable */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / old Edge */
+}
+.message{
+  overflow-y: auto; /* scroll enable */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / old Edge */
+}
+.message::-webkit-scrollbar{
+  display: none;
+}
+.theme::-webkit-scrollbar {
+  display: none;
+}

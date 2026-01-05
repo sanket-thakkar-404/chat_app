@@ -1,30 +1,8 @@
 const messageModel = require('../Models/message.model');
 const userModel = require('../Models/user.model')
-const cloudinary = require('../config/cloudinary.config')
+const cloudinary = require('../config/cloudinary.config');
+const { getReceiverSocketId, io } = require('../lib/Socket');
 
-
-module.exports.getUsersForSidebar = async (req, res) => {
-  try {
-    const loggedInUserId = req.user._id;
-
-    const users = await userModel
-      .find({ _id: { $ne: loggedInUserId } })
-      .select("-password");
-
-    return res.status(200).json({
-      success: true,
-      message: "Users fetched successfully",
-      users,
-    });
-
-  } catch (err) {
-    console.error("Error in getUsersForSidebar:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
-  }
-};
 
 module.exports.getMessage = async (req, res) => {
   try {
@@ -93,10 +71,19 @@ module.exports.sendMessage = async (req, res) => {
       image: imageUrl,
     });
 
+    await newMessage.save()
+
+    //  realtime functionally goes here ===> socket.io
+    const receiverSocketId = getReceiverSocketId(receiverId)
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit('newMessage', newMessage)
+    }
+
+
     return res.status(201).json({
       success: true,
       message: "Message sent successfully",
-      data: newMessage,
+      newMessage,
     });
 
   } catch (err) {
