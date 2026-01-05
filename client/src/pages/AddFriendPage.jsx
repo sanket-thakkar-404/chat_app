@@ -60,7 +60,6 @@ const AddFriendPage = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {friends.map((friend) => {
-              console.log(friend)
               return <FriendsCard key={friend._id} friend={friend} />;
             })}
           </div>
@@ -89,7 +88,6 @@ const AddFriendPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {recommendedUsers.map((user) => {
                 const hasRequestBeenSent = outGoingRequestIds.has(user._id);
-                console.log(hasRequestBeenSent);
                 return (
                   <RecommendCard
                     key={user._id}

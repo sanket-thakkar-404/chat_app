@@ -71,7 +71,6 @@ export const useUserStore = create((set, get) => ({
   getOutgoingFriendRequests: async () => {
     try {
       const res = await axiosInstance.get("/users/outgoing-friend-requests");
-      console.log(res.data.outgoingReq);
       set({ outgoingFriendRequests: res.data.outgoingReq || [] });
     } catch (err) {
       console.error("Error fetching outgoing requests:", err);
@@ -138,8 +137,6 @@ export const useUserStore = create((set, get) => ({
 
   bumpToRecent: (userId) =>
     set((state) => {
-      console.log("🔥 bumping", userId);
-      console.log("🟡 before", state.recentMap);
 
       return {
         recentMap: {

@@ -78,8 +78,8 @@ export const useChatStore = create((set, get) => ({
   // todo: Optimize this one later
   setSelectedUser: (user) => {
     set({ selectedUser: user });
-
-    // reset unread for that chat
+    console.log("Selected user set to:", user);
+    if(!user) return;
     useUserStore.getState().clearUnread(user._id);
   },
 }));
