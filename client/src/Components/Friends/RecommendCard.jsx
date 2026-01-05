@@ -1,4 +1,4 @@
-import { CheckCircle2, CheckCircleIcon, UserPlusIcon } from "lucide-react";
+import {  CheckCircleIcon, UserPlusIcon } from "lucide-react";
 import { useUserStore } from "../../Store/useUserStore";
 
 const RecommendCard = ({ user, hasRequestBeenSent }) => {

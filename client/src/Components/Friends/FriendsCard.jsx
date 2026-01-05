@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MessageSquare, CircleUserRound } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 
 const FriendsCard = ({friend }) => {
   return (

@@ -1,5 +1,3 @@
-import { Globe } from "lucide-react";
-import React from "react";
 
 const AuthImagePattern = ({ title, subtitle }) => {
   return (

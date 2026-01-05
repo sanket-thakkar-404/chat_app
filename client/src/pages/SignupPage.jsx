@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuthStore } from "../store/UseAuthStore";
+import { useAuthStore } from "../Store/UseAuthStore";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FormInput from "../Components/Reuseable/FormInput";

@@ -3,7 +3,7 @@ import { useUserStore } from "../Store/useUserStore";
 import { useEffect, useState } from "react";
 
 const SearchUser = () => {
-  const { friends, getMyFriends } = useUserStore();
+  const {  getMyFriends } = useUserStore();
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {

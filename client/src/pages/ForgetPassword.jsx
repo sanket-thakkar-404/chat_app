@@ -6,7 +6,7 @@ import FormInput from "../Components/Reuseable/FormInput";
 import { Mail } from "lucide-react";
 import LoadingButton from "../Components/Reuseable/LoadingButton";
 import toast from "react-hot-toast";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../Store/UseAuthStore";
 import AuthSwitchLink from "../Components/Reuseable/AuthSwitchLink";
 import { useNavigate } from "react-router-dom";
 

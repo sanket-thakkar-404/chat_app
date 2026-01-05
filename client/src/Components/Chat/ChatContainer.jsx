@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import MessageSkeleton from "../skeletons/MessageSkeletons";
 import { useChatStore } from "../../Store/useChatStore";
 import ChatHeader from "./ChatHeader";
@@ -6,6 +6,7 @@ import MessageInput from "./MessageInput";
 import { useAuthStore } from "../../Store/UseAuthStore";
 import { formatMessageTime } from "../../lib/utils";
 import { useRef } from "react";
+import ChatLoading from "../Reuseable/ChatLoading";
 
 const ChatContainer = (props) => {
   const {
@@ -66,9 +67,7 @@ const ChatContainer = (props) => {
 
   if (!authUser?._id) {
     return (
-      <div className="flex items-center justify-center h-full text-sm text-zinc-400">
-        Loading chat...
-      </div>
+    <ChatLoading />
     );
   }
 

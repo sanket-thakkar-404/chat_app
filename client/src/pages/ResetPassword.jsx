@@ -4,7 +4,7 @@ import Logo from "../Components/Reuseable/Logo";
 import AuthHeader from "../Components/Reuseable/AuthHeader";
 import FormInput from "../Components/Reuseable/FormInput";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../Store/UseAuthStore";
 import LoadingButton from "../Components/Reuseable/LoadingButton";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";

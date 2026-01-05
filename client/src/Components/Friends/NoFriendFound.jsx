@@ -1,5 +1,4 @@
 import { UserRoundPlus } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const NoFriendFound = ({title, subtitle}) => {
   return (

@@ -32,7 +32,7 @@ const VerifyOtp = () => {
     isResendingCode,
     authUser,
   } = useAuthStore();
-console.log(authUser)
+  console.log(authUser);
   const [status, setStatus] = useState("idle");
   const [userOTP, setUserOTP] = useState("");
   const [coolDown, setCoolDown] = useState(0);
@@ -41,11 +41,11 @@ console.log(authUser)
   const handleVerify = async () => {
     if (!email) {
       toast.error("No email found — restart process");
-      if(isResetMode) {
-        navigate('/forget-password')
+      if (isResetMode) {
+        navigate("/forget-password");
         return;
-      } 
-      navigate('/signup')
+      }
+      navigate("/signup");
       return;
     }
 
