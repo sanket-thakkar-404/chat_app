@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuthStore } from "../store/UseAuthStore";
+import { useAuthStore } from "../Store/UseAuthStore.jsx";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import AuthImagePattern from "../Components/Reuseable/AuthImagePattern";
