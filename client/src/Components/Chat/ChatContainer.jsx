@@ -127,7 +127,7 @@ const ChatContainer = (props) => {
 
                 {/* Text */}
                 {message.text && (
-                  <p className="leading-relaxed break-words">{message.text}</p>
+                  <p className="leading-relaxed break-wrap-break-word">{message.text}</p>
                 )}
 
                 {/* Timestamp */}
