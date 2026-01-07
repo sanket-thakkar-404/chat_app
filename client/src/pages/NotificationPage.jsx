@@ -58,6 +58,8 @@ const NotificationPage = () => {
 
                 <div className="space-y-3 h-auto message">
                   {incomingRequests.map((request) => {
+                    console.log(request);
+                    if(!request.sender) return null;
                     const fullname = `${request.sender.fullname.firstName} ${request.sender.fullname.lastName}`;
 
                     return (
