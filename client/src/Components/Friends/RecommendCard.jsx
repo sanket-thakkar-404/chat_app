@@ -9,7 +9,7 @@ const RecommendCard = ({ user, hasRequestBeenSent }) => {
   };
 
   return (
-    <div className="card bg-base-200 border border-base-300 rounded-2xl hover:shadow-xl hover:border-primary/40 transition-all duration-300">
+    <div className="card h-45  bg-base-200 border border-base-300 rounded-2xl hover:shadow-xl hover:border-primary/40 transition-all duration-300">
       <div className="card-body p-5 space-y-5  w-full">
         {/* USER HEADER */}
         <div className="flex items-center gap-4">

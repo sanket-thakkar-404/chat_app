@@ -32,6 +32,7 @@ module.exports.Verification_Email_Template = (name, verificationCode) => `
 
     .logo-icon {
       padding : 42px;
+      border-radius: 50%;
       text-align: center;
       border-radius: 8px;
       background: #5d5fef;

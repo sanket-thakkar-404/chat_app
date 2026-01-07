@@ -32,15 +32,16 @@ const AddFriendPage = () => {
   useEffect(() => {
     const outgoingIds = new Set();
     if (outgoingFriendRequests && outgoingFriendRequests.length > 0) {
-      outgoingFriendRequests.forEach((req) => {
-        outgoingIds.add(req.recipients._id);
-      });
+      // outgoingFriendRequests.forEach((req) => {
+      //   if(!req.recipients._id) return;
+      //   outgoingIds.add(req.recipients._id);
+      // });
       setOutGoingRequestIds(outgoingIds);
     }
   }, [outgoingFriendRequests]);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="p-4 sm:p-6 lg:p-8 h-screen message">
       <div className="container mx-auto space-y-10">
         <div className="flex  sm:flex-row items-start sm:items-center justify-between gap-4">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
@@ -58,7 +59,7 @@ const AddFriendPage = () => {
         ) : friends.length === 0 ? (
           <NoFriendFound title="You haven’t added any friends yet" subtitle=" Start connecting with people and grow your circle"/>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid message  h-[40vh] lg:h-[30vh]  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {friends.map((friend) => {
               return <FriendsCard key={friend._id} friend={friend} />;
             })}
@@ -85,7 +86,7 @@ const AddFriendPage = () => {
           ) : recommendedUsers.length === 0 ? (
             <NoRecommendFound />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid message h-[40vh] grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {recommendedUsers.map((user) => {
                 const hasRequestBeenSent = outGoingRequestIds.has(user._id);
                 return (

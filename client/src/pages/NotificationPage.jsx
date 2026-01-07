@@ -56,7 +56,7 @@ const NotificationPage = () => {
                   </span>
                 </h2>
 
-                <div className="space-y-3">
+                <div className="space-y-3 h-auto message">
                   {incomingRequests.map((request) => {
                     const fullname = `${request.sender.fullname.firstName} ${request.sender.fullname.lastName}`;
 
@@ -121,7 +121,7 @@ const NotificationPage = () => {
               <section className="space-y-4">
                
 
-                <div className="space-y-3">
+                <div className="space-y-3 h-[70vh] message">
                   {acceptedRequests.map((notification) => {
                     const fullname = `${notification.recipients.fullname.firstName} ${notification.recipients.fullname.lastName}`;
 

@@ -4,7 +4,7 @@ import { MessageSquare } from "lucide-react";
 const FriendsCard = ({friend }) => {
   return (
 
-      <div className="group card bg-base-200/80 border border-base-300 rounded-3xl p-5 shadow-sm
+      <div className="group h-50  card bg-base-200/80 border border-base-300 rounded-3xl p-5 shadow-sm
         hover:shadow-xl hover:border-primary/50 hover:bg-base-200 transition-all duration-300">
 
         {/* Top Section */}
