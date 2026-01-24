@@ -18,11 +18,12 @@ export const useAuthStore = create((set, get) => ({
   isResettingPassword: false,
   isUpdatingProfile: false,
   isRandomProfile: false,
-  isCheckingAuth: true,
+  isCheckingAuth: false,
   socket: null,
 
   checkAuth: async () => {
     try {
+      set({ isCheckingAuth: true });
       const res = await axiosInstance.get("/auth/check-auth");
       set({ authUser: res.data.user });
       get().connectSocket();
@@ -131,7 +132,7 @@ export const useAuthStore = create((set, get) => ({
       return { success: true, data: res.data };
     } catch (err) {
       console.error("Error in Login Page :", err);
-      toast.error(err.response.data.message || 'fail to login');
+      toast.error(err.response.data.message || "fail to login");
     } finally {
       set({ isLoggingIn: false });
     }
@@ -216,7 +217,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.put("/auth/update-random-profile", data);
       toast.success(
-        res.data.message || "Random Profile pic updated successfully"
+        res.data.message || "Random Profile pic updated successfully",
       );
     } catch (err) {
       console.error("Error in Random Updating Profile", err);
@@ -258,5 +259,4 @@ export const useAuthStore = create((set, get) => ({
       socket.disconnect();
     }
   },
-  
 }));
