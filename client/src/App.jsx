@@ -22,9 +22,9 @@ const App = () => {
 
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+  }, []);
 
-  if (isCheckingAuth && !authUser) {
+  if (isCheckingAuth ) {
     return (
       <div className="flex items-center justify-center h-screen">
         <span className="skeleton skeleton-text text-2xl md:text-3xl">
