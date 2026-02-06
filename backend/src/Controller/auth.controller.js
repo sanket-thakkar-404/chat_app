@@ -440,8 +440,8 @@ module.exports.updateRandomAvatar = async (req, res) => {
     });
 
   } catch (err) {
-    console.log('Error In Random avatar generator' , err)
-     return res.status(500).json({
+    console.log('Error In Random avatar generator', err)
+    return res.status(500).json({
       success: false,
       message: "Internal server error"
     });
@@ -451,7 +451,12 @@ module.exports.updateRandomAvatar = async (req, res) => {
 // user logout 
 module.exports.logoutUser = (req, res) => {
   try {
-    res.cookie('token', "", { maxAge: 0 })
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: true,        // production me true
+      sameSite: 'strict',  // ya jo login me use kiya tha
+      path: '/'
+    });
     res.status(200).json({ message: 'Logged out successfully' })
   } catch (err) {
     console.error('Error in Logout Controller', err.message)

@@ -5,7 +5,12 @@
     "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden",
     "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black",
     "luxury", "dracula", "cmyk", "autumn", "business", "acid", "lemonade",
-    "night", "coffee", "winter", "dim", "nord", "sunset"
+    "night", "coffee", "winter", "dim", "nord", "sunset";
+}
+html,
+body,
+#root {
+  height: 100%;
 }
 
 body {
@@ -16,12 +21,12 @@ body {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE / old Edge */
 }
-.message{
+.message {
   overflow-y: auto; /* scroll enable */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE / old Edge */
 }
-.message::-webkit-scrollbar{
+.message::-webkit-scrollbar {
   display: none;
 }
 .theme::-webkit-scrollbar {

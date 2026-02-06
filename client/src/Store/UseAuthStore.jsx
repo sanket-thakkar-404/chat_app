@@ -24,9 +24,13 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       set({ isCheckingAuth: true });
-      if (get().authUser) return;
       const res = await axiosInstance.get("/auth/check-auth");
       set({ authUser: res.data.user });
+
+      if (!get().socket) {
+        get().connectSocket();
+      }
+
       get().connectSocket();
     } catch (err) {
       console.error("Error in checkAuth  : ", err);
@@ -116,7 +120,7 @@ export const useAuthStore = create((set, get) => ({
       get().disconnectSocket();
       toast.success("Logged out SuccessFully");
     } catch (err) {
-      console.error("Error in Logging out ", err);
+      console.error("Error in Logging out ", err.message);
       toast.error("Error in Logging Out");
     }
   },

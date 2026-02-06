@@ -18,7 +18,7 @@ const generateToken = (userId, email, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   };
 
-  res.cookie('token', token, cookieOptions);
+  res.cookie('token',token,cookieOptions);
 
   return token;
 };

@@ -40,7 +40,7 @@ const ChatPage = () => {
       <div
         ref={chatPanelRef}
        
-        className=" absolute bottom-0 left-0 md:left-35 lg:hidden translate-y-full bg-base-300 h-full md:w-[86%] lg:w-[80%] w-full z-20"
+        className="absolute bottom-0 left-0 md:left-35 lg:hidden translate-y-full h-full md:w-[86%] lg:w-[80%] w-full z-20"
       >
          {selectedUser ? <ChatContainer  setChatPanel={setChatPanel}/> : <NoChatSelected/>}
        

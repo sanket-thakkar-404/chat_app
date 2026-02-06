@@ -72,7 +72,7 @@ const ChatContainer = (props) => {
   }
 
   return (
-    <div className="flex h-[93vh] flex-col flex-1  ">
+    <div className="flex h-[93vh] flex-col flex-1">
       <ChatHeader setChatPanel={props.setChatPanel} />
       <div className="flex-1 message p-4 space-y-3">
         {uniqueMessages.map((message) => {
